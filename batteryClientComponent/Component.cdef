@@ -1,0 +1,13 @@
+requires:
+{
+    api:
+    {
+        /home/asyal/mangOH/apps/BatteryService/ma_battery.api
+        /home/asyal/mangOH/apps/BatteryService/ma_adminbattery.api
+    }
+}
+
+sources:
+{
+    batteryClient.c
+}
