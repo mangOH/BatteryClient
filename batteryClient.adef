@@ -23,6 +23,6 @@ processes:
 
 bindings:
 {
-    batteryClient.batteryClientComponent.ma_battery -> batteryService.ma_battery
-    batteryClient.batteryClientComponent.ma_adminbattery -> batteryService.ma_adminbattery
+    batteryClient.batteryClientComponent.ma_battery -> battery.ma_battery
+    batteryClient.batteryClientComponent.ma_adminbattery -> battery.ma_adminbattery
 }

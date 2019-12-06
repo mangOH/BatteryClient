@@ -28,57 +28,38 @@ void percentageHandler
 
 void chargeHandler
 (
-    ma_battery_ChargeCondition_t chargecondition,
+    ma_battery_ChargingStatus_t chargeCondition,
     void *context
 )
 {
     LE_INFO(
         "Received a charge alarm level event.  Charge Alarm  is %d and context=0x%p",
-        chargecondition, context);
+        chargeCondition, context);
 }
 
 void healthHandler
 (
-    ma_battery_HealthCondition_t healthcondition,
+    ma_battery_HealthStatus_t healthStatus,
     void *context
 )
 {
     LE_INFO(
         "Received a health alarm level event.  Health Alarm is %d and context=0x%p",
-        healthcondition, context);
+        healthStatus, context);
 }
 
 COMPONENT_INIT
 {
-    ma_adminbattery_SetTechnology("LIPO", 2000, 3700);
-
-
-    char batteryType[256];
-    uint16_t maH;
-    uint16_t voltage; // millivolts
-    uint16_t energy;  // mWh
     uint16_t percentremaining;
     uint16_t energyremaining;
     double currentvoltage, currenttemp;
-    bool present;
 
-    le_result_t result =
-        ma_battery_GetTechnology(batteryType, sizeof(batteryType), &maH, &voltage, &energy);
-    if (result == LE_OK)
-    {
-        LE_INFO(
-            " battery type = %s, capacity = %hd mAh,  voltage = %hd mV, energy = %hd mWh",
-            batteryType, maH, voltage, energy);
-    }
-    else
-    {
-        LE_ERROR("Unable to get battery technology info (%s)", LE_RESULT_TXT(result));
-    }
+    ma_adminbattery_SetTechnology("LIPO", 2000, 3700);
 
-    ma_battery_HealthCondition_t health = ma_battery_GetHealthStatus();
+    ma_battery_HealthStatus_t health = ma_battery_GetHealthStatus();
     LE_INFO(" health = %d", health);
 
-    ma_battery_ChargeCondition_t charge = ma_battery_GetChargeStatus();
+    ma_battery_ChargingStatus_t charge = ma_battery_GetChargingStatus();
     LE_INFO("charge = %d", charge);
 
     le_result_t result1 = ma_battery_GetVoltage(&currentvoltage);
@@ -86,7 +67,6 @@ COMPONENT_INIT
     {
         LE_INFO(" current voltage = %lf in millivolts", currentvoltage);
     }
-
 
     le_result_t result2 = ma_battery_GetTemp(&currenttemp);
     if (result2 == LE_OK)
@@ -100,20 +80,16 @@ COMPONENT_INIT
         LE_INFO(" current percent = %d", percentremaining);
     }
 
-
     le_result_t result4 = ma_battery_GetChargeRemaining(&energyremaining);
     if (result4 == LE_OK)
     {
         LE_INFO(" current energy = %d", energyremaining);
     }
 
-    present = ma_battery_Present();
-    LE_INFO("Present or not %d", present);
-
 
     ma_battery_AddLevelPercentageHandler(80, 90, percentageHandler, (void *)0xdeadbeef);
 
-    ma_battery_AddAlarmChargeHandler(chargeHandler, NULL);
+    ma_battery_AddChargingStatusChangeHandler(chargeHandler, NULL);
 
-    ma_battery_AddAlarmHealthHandler(healthHandler, NULL);
+    ma_battery_AddHealthChangeHandler(healthHandler, NULL);
 }
